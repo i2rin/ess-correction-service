@@ -14,15 +14,18 @@
     - ユーザは、ほかのユーザのアップした英⽂に対し、コメントを残すことができる
     - ユーザによるコメント機能には、特定の英⽂の節に対する意⾒の際、英⽂全体のどの部分について述べているのかを誘導できる機能を求める
 
-## 概要
+## 開発者向け
+### ドキュメント
+- [ブランチ戦略](docs/branch-strategy.md)
+-  [ディレクトリ構成](docs/directory-strategy.md)
 
-環境構築
+### 環境構築
 
 ```bash
 npm install && npm run prepare
 ```
 
-## Storybook
+### Storybook
 
 [http://localhost:6006/](http://localhost:6006/)から UI チェックができます．
 
