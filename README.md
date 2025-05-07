@@ -15,3 +15,11 @@
 ```bash
 npm install && npm run prepare
 ```
+
+## Storybook
+
+[http://localhost:6006/](http://localhost:6006/)から UI チェックができます．
+
+```bash
+npm run storybook
+```
