@@ -17,7 +17,8 @@
 ## 開発者向け
 ### ドキュメント
 - [ブランチ戦略](docs/branch-strategy.md)
--  [ディレクトリ構成](docs/directory-strategy.md)
+- [ディレクトリ構成](docs/directory-strategy.md)
+- [詳細な仕様について](docs/detail-feature.md)
 
 ### 環境構築
 
