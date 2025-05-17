@@ -1,0 +1,38 @@
+erDiagram
+    USERS {
+        int id PK
+        varchar username
+        text password_hash
+        boolean is_admin
+        timestamp created_at
+    }
+
+    SUBMISSIONS {
+        uuid id PK
+        int user_id FK
+        text text
+        text res
+        timestamp created_at
+    }
+
+    CORRECTIONS {
+        int id PK
+        uuid submission_id FK
+        text original
+        text corrected
+        text reason
+        boolean is_human
+    }
+
+    COMMENTS {
+        int id PK
+        uuid submission_id FK
+        int user_id FK
+        text text
+        timestamp created_at
+    }
+
+    USERS ||--o{ SUBMISSIONS : creates
+    SUBMISSIONS ||--o{ CORRECTIONS : has
+    SUBMISSIONS ||--o{ COMMENTS : receives
+    USERS ||--o{ COMMENTS : writes
