@@ -424,82 +424,29 @@ paths:
         '500':
           description: Server error
 
-  /submissions/human:
-    post:
-      summary: Submit human correction
-      tags: [HumanCorrection]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                submissionId:
-                  type: string
-                corrections:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      original:
-                        type: string
-                      corrected:
-                        type: string
-                      reason:
-                        type: string
-              required: [submissionId, corrections]
-      responses:
-        '201':
-          description: Human correction submitted
-        '400':
-          description: Bad request
-        '401':
-          description: Unauthorized
-        '404':
-          description: Submission not found
-        '500':
-          description: Server error
-    get:
-      summary: Get human corrections for a submission
-      tags: [HumanCorrection]
+  /submissions/comment/delete:
+    delete:
+      summary: Delete a comment
+      tags: [Comment]
       parameters:
         - in: query
-          name: submissionId
+          name: id
           schema:
             type: string
           required: true
-          description: ID of the submission to retrieve human corrections for
+          description: Comment ID
       responses:
         '200':
-          description: List of human corrections
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  submissionId:
-                    type: string
-                  corrections:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        original:
-                          type: string
-                        corrected:
-                          type: string
-                        reason:
-                          type: string
+          description: Comment deleted successfully
         '400':
-          description: Missing or invalid submissionId
+          description: Missing ID
         '401':
           description: Unauthorized
         '404':
-          description: Submission not found or no human corrections
+          description: Comment not found
         '500':
           description: Server error
-
+          
 
   /submissions/delete:
     delete:
