@@ -149,35 +149,14 @@ GET /submissions/select?page=2&limit=10&sortBy=date
 指定された投稿 ID に対するコメント一覧を取得します。
 
 ---
+---
 
-## 👤 人による修正機能
+### `delete /submissions/comments?id={submissionId}`
 
-### `POST /submissions/human`
+指定された投稿に対して行った自分のコメントを削除する。
 
-人間の修正を記録します。
+---
 
-- **リクエスト**:
-
-```json
-{
-  "submissionId": "abc123",
-  "corrections": [
-    {
-      "original": "He go to school.",
-      "corrected": "He goes to school.",
-      "reason": "Subject-verb agreement"
-    }
-  ]
-}
-```
-
-- **レスポンス**:
-
-```json
-{
-  "message": "Human correction submitted"
-}
-```
 
 ---
 
