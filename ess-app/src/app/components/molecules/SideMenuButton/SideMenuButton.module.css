@@ -1,0 +1,29 @@
+.container {
+  overflow: hidden;
+}
+
+.button {
+  transition: all var(--animation-duration) ease;
+  transform-origin: left center;
+}
+
+.icon {
+  transition: transform var(--animation-duration) ease;
+}
+
+.text {
+  transition: transform var(--animation-duration) ease;
+  transform: translateX(0);
+}
+
+.container:hover .button {
+  background-color: var(--hover-color);
+}
+
+.container:hover .icon {
+  transform: scale(1.1);
+}
+
+.container:hover .text {
+  transform: translateX(8px);
+}

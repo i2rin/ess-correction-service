@@ -1,0 +1,36 @@
+.appBar {
+  width: 100%;
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.icon a {
+  font-family: inherit;
+  text-decoration: none;
+  border-bottom: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
+.text {
+  font-size: 16px;
+  font-weight: 700;
+  font-family:
+    'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Yu Gothic Medium', 'Meiryo',
+    'Takao', 'IPAexGothic', 'IPAPGothic', 'VL PGothic', 'Noto Sans CJK JP',
+    sans-serif;
+  cursor: default;
+}
