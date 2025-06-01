@@ -1,0 +1,2 @@
+cd ess-app
+npx lint-staged
