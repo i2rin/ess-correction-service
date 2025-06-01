@@ -1,274 +1,121 @@
-# 📘 English Submission Correction API
+# ess-correction-service
 
-この API は、英作文の添削とフィードバックを行う Web サービスのためのバックエンド API です。
-ユーザーは英文を投稿し、AI による添削を受け取り、それに対してコメントや人間による修正を行うことができます。
-
----
-
-## ER 図
-
-- [こちら](https://mermaid.live/edit#pako:eNqlk91v2jAQwP8V654DIiRZgh_HmFRVtBNpXyok5MZXYgnbyB9tN8r_PiehA1I0rZofnNyX7-c73w4qzREooPkm2NowuVQkrPtytijJrhOaJZQjgpMf10fVMzNVzQzxFo1iEo8Wh6-ObJm1L9rwVc1sfbQ9ar1BpoiwK8alUCdRQqJ1TG5JZZA55CvmOuu--3R7ef91flWWV7c3Z4DeB7weYQPd0K2C_vt1j6_ZeiqD9tM409vFYja96-NcqFdLaP2jFNYKrS5CaSPWQrFNT11pY7AKDB-AmdXqYnFrL5m6yDufz27u_hP2M5X9tzp2L-7tbTDQu7Me00Oc_dj-g_dpCygJz-0vnofL01C6CsXz-6ln2U-8XoxoM0MEayM4UGc8RiDRSNaI0FZxCa7GMABAwy_HJ-Y3bglLtQ9hW6YetJbvkUb7dQ30iW1skPyWh5sdJu-PCyqOZqq9ckCz9gSgO3gFmkyGSZ5OvsRFlozGeZKmEfwEOiiyYZIVRVpkeZznQb-P4FebdDQsRmkyLopxOooncZxNIkAunDbzbu7b8d__Bv62MMM)．
-
-## 🔐 認証とユーザー登録
-
-### `POST /auth/register`
-
-- 管理者専用：新規ユーザーを登録
-- **リクエスト**:
-
-```json
-{
-  "username": "yourname",
-  "password": "yourpass"
-}
-```
+## 画面毎の説明
 
 ---
 
-### `POST /auth/login`
+### ログイン画面
 
-- ユーザーがログインし、セッションを取得
-- **リクエスト**:
-
-```json
-{
-  "username": "yourname",
-  "password": "yourpass"
-}
-```
+ユーザは
+`UserId, password`
+を入力してログインを行います。
+この際にユーザが admin かどうかを `res` として返します。
 
 ---
 
-### `POST /auth/logout`
+### 管理者画面・ユーザ編集画面
 
-- セッションを終了してログアウト
+ここではユーザの登録を admin が行います。ログインの際に admin であれば表示されます。
 
-> 認証後、Cookie に `sessionid` を保持した状態で他エンドポイントを利用
+登録・変更時には以下を入力：
+`UserId, password, name, mailaddress`
 
----
+削除時には：
+`UserId` のみ入力します。
 
-## ✍️ 投稿・添削機能
-
-### `POST /submissions/input`
-
-英文を送信し、AI が添削結果を返します。
-たとえば text に間違いが複数見られる時にはその文が配列として複数追加されます。
-例が分かりにくいかもしれないです。
-
-- **リクエスト**:
-
-```json
-{
-  "id": "subm001",
-  "text": "This is original text.",
-  "res": "This is corrected text.",
-  "corrections": [
-    {
-      "original": "This is original text.",
-      "corrected": "This is corrected text.",
-      "reason": "Subject-verb agreement."
-    }
-  ]
-}
-```
-
-- **レスポンス**: 同じ構造のオブジェクトを返却
+取得時は上記4項目が配列で取得されます。
 
 ---
 
-### `GET /submissions/select`
+### タイムライン画面
 
-全ユーザーの添削済み投稿を一覧で取得します。
+ここでは、いつ誰がAI添削を行ったかが日付昇順で確認できます。
 
-- **レスポンス**:
-
-```json
-[
-  {
-    "id": "abc123",
-    "text": "Original text",
-    "res": "Corrected text",
-    "corrections": [
-      {
-        "original": "Original text",
-        "corrected": "Corrected text",
-        "reason": "Explanation here."
-      }
-    ],
-    "comments": [
-      {
-        "user": "bob",
-        "text": "Nice fix!"
-      }
-    ]
-  }
-]
-```
-
-```
-GET /submissions/select?page=2&limit=10&sortBy=date
-```
-
-上記のようにして一挙取得における負担を軽減している
+- `name`：添削を行ったユーザの氏名
+- `text`：そのユーザが書いた英文
+- `date`：投稿された日付
+- `submissionId`：その投稿に紐づくID
 
 ---
 
-### `GET /submissions/by-user?username={username}`
+### 他人の英文にコメントする画面
 
-指定ユーザーの投稿一覧を取得します。
+他の人の英文とそれに対するコメントを閲覧・投稿できます。
 
----
+※タイムライン画面から遷移し、`submissionId` をクエリパラメータでGET送信。
 
-## 💬 コメント機能
-
-### `POST /submissions/comment`
-
-添削投稿に対してコメントを追加します。
-
-- **リクエスト**:
-
-```json
-{
-  "id": "abc123",
-  "text": "Great correction!"
-}
-```
-
-- **レスポンス**:
-
-```json
-{
-  "message": "Comment posted successfully"
-}
-```
+- `name`：投稿ユーザの氏名
+- `text`：そのユーザが書いた英文
+- `corrections`：
+  - `original`：修正箇所の抜粋
+  - `corrected`：修正後の文章
+  - `reason`：修正理由
 
 ---
 
-### `GET /submissions/comments?id={submissionId}`
+### 英文入力画面
 
-指定された投稿 ID に対するコメント一覧を取得します。
+自分で書いた英文を AI に提出します。
 
----
----
+- リクエスト：`text`
+- レスポンス：`text` と `corrections`
 
-### `delete /submissions/comments?id={submissionId}`
-
-指定された投稿に対して行った自分のコメントを削除する。
+※結果は `localStorage` に保持 → AI採点後画面へ遷移
 
 ---
 
+### AI採点後画面
+
+`localStorage` にある結果を表示します。
+投稿ボタンにより、`text` と `corrections` を POST 送信します。
 
 ---
 
-## 📤 `POST /submissions/save` – 投稿をデータベースに保存
+### 通知画面
 
-このエンドポイントは、AI が添削した英文を「投稿」として保存するために使用します。
-ユーザーが `/input` で AI 添削を確認した後、「投稿」として確定する際にこの API を呼び出します。
+他のユーザから自分へのコメント通知を、日付昇順で表示します。
 
-#### corrections 配列の要素:
-
-```json
-{
-  "original": "has",
-  "corrected": "have",
-  "reason": "Subject-verb agreement"
-}
-```
-
-#### レスポンス例:
-
-```json
-{
-  "message": "Submission saved successfully",
-  "id": "abc123xyz"
-}
-```
+- セッションにある `UserId` を使って取得
+- 結果：
+  - `name`：コメントしたユーザの氏名
+  - `submissionId`：コメントが紐づく投稿の ID
 
 ---
 
-### 📝 使用例
+### 通知詳細画面
 
-```bash
-POST /submissions/save
-Content-Type: application/json
-Cookie: sessionid=your_session_cookie
+通知画面から選んだ投稿に対するコメントを表示します。
 
-{
-  "text": "I has a pen.",
-  "res": "I have a pen.",
-  "corrections": [
-    {
-      "original": "has",
-      "corrected": "have",
-      "reason": "Subject-verb agreement"
-    }
-  ]
-}
-```
+- クエリで `submissionId` を渡す
+- レスポンス：
+  - `text`：ログインユーザが行った投稿
+  - `messages`: 配列（以下の形式）
+    - `name`：コメントした人の名前
+    - `message`：コメント内容
 
 ---
 
-### `GET /submissions/human?id={submissionId}`
+### マイページ
 
-指定された投稿 ID に対する人間の修正一覧を取得します。
+自分の投稿一覧を表示・削除できます。
 
-- **レスポンス**:
-
-```json
-{
-  "submissionId": "abc123",
-  "corrections": [
-    {
-      "original": "He go to school.",
-      "corrected": "He goes to school.",
-      "reason": "Subject-verb agreement"
-    }
-  ]
-}
-```
+- セッションの `UserId` を使って投稿一覧を取得
 
 ---
 
-## ⚠️ エラーハンドリング
+### 各投稿の詳細
 
-| ステータス | 内容                                                   |
-| ---------- | ------------------------------------------------------ |
-| `400`      | リクエストの形式が正しくない（必須フィールド不足など） |
-| `401`      | 認証が必要（未ログイン状態）                           |
-| `404`      | リソースが存在しない（例: 投稿が見つからない）         |
-| `409`      | 登録済みユーザー名の重複などの競合                     |
-| `500`      | サーバー内部エラー（AI 処理失敗・DB 不具合など）       |
+マイページで選択した自分の投稿に対して
+AIの添削前後やコメントを表示します。
+
+- クエリで `submissionId` を渡し、詳細を表示
 
 ---
 
-## 🔒 認証仕様（セキュリティ）
+### セッションで保持される情報
 
-この API は Cookie に `sessionid` を含めてユーザー認証を行います。
+- `UserId`
+- `name`
+- `password`
+  
 
-```yaml
-components:
-  securitySchemes:
-    SessionAuth:
-      type: apiKey
-      in: cookie
-      name: sessionid
-
-security:
-  - SessionAuth: []
-```
-
----
-
-## 🧪 使用例（典型的なフロー）
-
-1. ユーザーがログイン（`/auth/login`）
-2. 英文を `/submissions/input` に投稿
-3. 添削結果を `/submissions/select` または `/submissions/by-user` で取得
-4. 他ユーザーが `/submissions/comment` でコメント
-5. 教師や人間が `/submissions/human` で追加修正
-
----
-
-## 📂 ライセンス
-
-この API 仕様はプロジェクト用途に合わせて自由に拡張・変更してください。

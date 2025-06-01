@@ -1,16 +1,36 @@
 openapi: 3.0.0
 info:
-  title: English Submission Correction API
+  title: 英文添削アプリAPI
   version: 1.0.0
-  description: >
-    英文を提出し、AIの添削を受けた結果に対してコメントできるシステムのAPIです。
-    ユーザーは管理者登録後にログインし、自身の英文を投稿・添削し、他のユーザーはそれにコメントします。
+
+tags:
+  - name: Login
+    description: ログイン画面
+  - name: Logout
+    description: ログアウト画面
+  - name: UserManagement
+    description: 管理者画面・ユーザー編集画面
+  - name: Timeline
+    description: タイムライン画面
+  - name: Comment
+    description: 他人の英文にコメントする画面
+  - name: Submit
+    description: 英文入力画面
+  - name: AIScore
+    description: AI採点後画面
+  - name: Notification
+    description: 通知画面
+  - name: MyPage
+    description: マイページ
+  - name: SubmissionDetail
+    description: 各投稿の詳細
 
 paths:
-  /auth/register:
+  /login:
     post:
-      summary: Register a new user (admin only)
-      tags: [Auth]
+      tags:
+        - Login
+      summary: ログイン
       requestBody:
         required: true
         content:
@@ -18,282 +38,107 @@ paths:
             schema:
               type: object
               properties:
-                username:
+                UserId:
                   type: string
                 password:
                   type: string
-              required: [username, password]
       responses:
-        '201':
-          description: User registered successfully
+        '200':
+          description: ログイン成功
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  message:
-                    type: string
-                    example: User registered successfully
-        '400':
-          description: Bad request (missing or invalid parameters)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Username and password are required"
-        '409':
-          description: Conflict (username already exists)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Username already exists"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "An unexpected error occurred"
-
-  /auth/login:
+                  admin:
+                    type: boolean
+  
+  /logout:
     post:
-      summary: Login with username and password
-      tags: [Auth]
+      tags:
+        - Logout
+      summary: ログアウト
+      responses:
+        '200':
+          description: ログアウト成功
+
+  /users:
+    post:
+      tags:
+        - UserManagement
+      summary: ユーザー作成
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                username:
-                  type: string
-                password:
-                  type: string
-              required: [username, password]
+              $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: Logged in successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Login successful
-        '400':
-          description: Bad request (missing or malformed parameters)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Missing username or password"
-        '401':
-          description: Unauthorized (invalid credentials)
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "Invalid username or password"
-        '500':
-          description: Internal server error
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                    example: "An unexpected error occurred"
+          description: 作成成功
 
-  /auth/logout:
-    post:
-      summary: Logout the current session
-      tags: [Auth]
-      responses:
-        '204':
-          description: Session terminated successfully
-
-  /auth/delete:
-    delete:
-      summary: Delete a user account (admin only)
-      tags: [Auth]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                username:
-                  type: string
-              required: [username]
-      responses:
-        '200':
-          description: Account deleted successfully
-        '400':
-          description: Missing or invalid username
-        '401':
-          description: Unauthorized
-        '404':
-          description: User not found
-        '500':
-          description: Internal server error
-
-  /submissions/select:
     get:
-      summary: Get paginated AI-corrected submissions
-      tags: [Submission]
+      tags:
+        - UserManagement
+      summary: 全ユーザー取得
       parameters:
         - in: query
-          name: page
-          schema:
-            type: integer
-          required: false
-          description: Page number
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          required: false
-          description: Items per page
-        - in: query
-          name: sortBy
+          name: UserId
           schema:
             type: string
-          required: false
-          description: Field to sort by (e.g., date, id)
       responses:
         '200':
-          description: A list of corrected submissions
+          description: ユーザー情報一覧
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  type: object
-                  properties:
-                    id:
-                      type: string
-                    text:
-                      type: string
-                    res:
-                      type: string
-                    corrections:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          original:
-                            type: string
-                          corrected:
-                            type: string
-                          reason:
-                            type: string
-                    comments:
-                      type: array
-                      items:
-                        type: object
-                        properties:
-                          user:
-                            type: string
-                          text:
-                            type: string
-        '401':
-          description: Unauthorized
-        '500':
-          description: Internal server error
+                  $ref: '#/components/schemas/User'
 
-  /submissions/save:
-   post:
-    summary: Save an AI-corrected submission to the database
-    tags: [Submission]
-    requestBody:
-      required: true
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              text:
-                type: string
-              res:
-                type: string
-              corrections:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    original:
-                      type: string
-                    corrected:
-                      type: string
-                    reason:
-                      type: string
-            required: [text, res, corrections]
-    responses:
-      '201':
-        description: Submission saved successfully
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                message:
-                  type: string
-                id:
-                  type: string
-      '400':
-        description: Bad request
-      '401':
-        description: Unauthorized
-      '500':
-        description: Internal server error
-
-
-  /submissions/by-user:
-    get:
-      summary: Get submissions by specific user
-      tags: [Submission]
+  /users/{UserId}:
+    put:
+      tags:
+        - UserManagement
+      summary: ユーザー更新
       parameters:
-        - in: query
-          name: username
-          schema:
-            type: string
+        - in: path
+          name: UserId
           required: true
-          description: Username to filter by
-        - in: query
-          name: page
           schema:
-            type: integer
-          required: false
-          description: Page number
-        - in: query
-          name: limit
-          schema:
-            type: integer
-          required: false
-          description: Items per page
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
       responses:
         '200':
-          description: Submissions by user returned successfully
+          description: 更新成功
+
+    delete:
+      tags:
+        - UserManagement
+      summary: ユーザー削除
+      parameters:
+        - in: path
+          name: UserId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 削除成功
+
+  /timeline:
+    get:
+      tags:
+        - Timeline
+      summary: タイムライン取得
+      responses:
+        '200':
+          description: 投稿一覧
           content:
             application/json:
               schema:
@@ -301,73 +146,48 @@ paths:
                 items:
                   type: object
                   properties:
-                    id:
+                    name:
                       type: string
                     text:
                       type: string
-                    res:
+                    date:
                       type: string
-        '400':
-          description: Missing or invalid username
-        '401':
-          description: Unauthorized
-        '404':
-          description: User not found or no submissions
-        '500':
-          description: Server error
+                      format: date
+                    submissionId:
+                      type: string
 
-  /submissions/input:
-    post:
-      summary: Submit text for AI correction
-      tags: [Submission]
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                text:
-                  type: string
-              required: [id, text]
+  /comment:
+    get:
+      tags:
+        - Comment
+      summary: コメント取得
+      parameters:
+        - in: query
+          name: submissionId
+          required: true
+          schema:
+            type: string
       responses:
         '200':
-          description: Correction results returned
+          description: コメント内容
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
+                  name:
                     type: string
                   text:
-                    type: string
-                  res:
                     type: string
                   corrections:
                     type: array
                     items:
-                      type: object
-                      properties:
-                        original:
-                          type: string
-                        corrected:
-                          type: string
-                        reason:
-                          type: string
-        '400':
-          description: Missing fields
-        '401':
-          description: Unauthorized
-        '500':
-          description: Server error
+                      $ref: '#/components/schemas/Correction'
 
-  /submissions/comment:
     post:
-      summary: Post a comment on a submission
-      tags: [Comment]
+      tags:
+        - Comment
+      summary: コメント投稿
       requestBody:
         required: true
         content:
@@ -375,37 +195,78 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                submissionId:
                   type: string
-                text:
+                message:
+                  type: array
+                  items:
+                    type: string
+                date:
                   type: string
-              required: [id, text]
-      responses:
-        '201':
-          description: Comment posted successfully
-        '400':
-          description: Bad request
-        '401':
-          description: Unauthorized
-        '404':
-          description: Submission not found
-        '500':
-          description: Server error
-
-  /submissions/comments:
-    get:
-      summary: Get comments for a submission
-      tags: [Comment]
-      parameters:
-        - in: query
-          name: id
-          schema:
-            type: string
-          required: true
-          description: Submission ID
+                  format: date
       responses:
         '200':
-          description: List of comments
+          description: 投稿成功
+
+  /submit:
+    post:
+      tags:
+        - Submit
+      summary: 英文送信（保存なし）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: 添削結果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  corrections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Correction'
+
+  /ai-score:
+    post:
+      tags:
+        - AIScore
+      summary: AIによる採点記録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                corrections:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Correction'
+      responses:
+        '200':
+          description: 登録完了
+
+  /notifications:
+    get:
+      tags:
+        - Notification
+      summary: 通知取得
+      responses:
+        '200':
+          description: 通知一覧
           content:
             application/json:
               schema:
@@ -413,70 +274,140 @@ paths:
                 items:
                   type: object
                   properties:
-                    user:
+                    name:
                       type: string
+                    submissionId:
+                      type: string
+
+  /notification-detail:
+    get:
+      tags:
+        - Notification
+      summary: 通知詳細取得
+      parameters:
+        - in: query
+          name: submissionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 通知詳細
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        message:
+                          type: string
+
+  /mypage:
+    get:
+      tags:
+        - MyPage
+      summary: ユーザーの投稿一覧
+      responses:
+        '200':
+          description: 投稿一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    date:
+                      type: string
+                      format: date
                     text:
                       type: string
-        '400':
-          description: Missing ID
-        '404':
-          description: Submission not found
-        '500':
-          description: Server error
+                    submissionId:
+                      type: string
 
-  /submissions/comment/delete:
+  /mypage/{submissionId}:
     delete:
-      summary: Delete a comment
-      tags: [Comment]
+      tags:
+        - MyPage
+      summary: 投稿削除
       parameters:
-        - in: query
-          name: id
+        - in: path
+          name: submissionId
+          required: true
           schema:
             type: string
-          required: true
-          description: Comment ID
       responses:
         '200':
-          description: Comment deleted successfully
-        '400':
-          description: Missing ID
-        '401':
-          description: Unauthorized
-        '404':
-          description: Comment not found
-        '500':
-          description: Server error
-          
+          description: 削除完了
 
-  /submissions/delete:
-    delete:
-      summary: Delete a submission
-      tags: [Submission]
+  /submission-detail:
+    get:
+      tags:
+        - SubmissionDetail
+      summary: 投稿詳細
       parameters:
         - in: query
-          name: id
+          name: submissionId
+          required: true
           schema:
             type: string
-          required: true
-          description: Submission ID
       responses:
         '200':
-          description: Submission deleted successfully
-        '400':
-          description: Missing ID
-        '401':
-          description: Unauthorized
-        '404':
-          description: Submission not found
-        '500':
-          description: Server error
+          description: 投稿詳細
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  corrections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Correction'
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        message:
+                          type: string
 
 components:
-  securitySchemes:
-    SessionAuth:
-      type: apiKey
-      in: cookie
-      name: sessionid
+  schemas:
+    User:
+      type: object
+      properties:
+        UserId:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        mailaddress:
+          type: string
+        admin:
+          type: boolean
 
-security:
-  - SessionAuth: []
+    Correction:
+      type: object
+      properties:
+        original:
+          type: string
+        corrected:
+          type: string
+        reason:
+          type: string
+

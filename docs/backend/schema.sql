@@ -1,36 +1,35 @@
-//User登録のためのSQLスキーマ
-CREATE TABLE users (
-  id SERIAL PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password_hash TEXT NOT NULL,
-  is_admin BOOLEAN DEFAULT FALSE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE USER (
+    UserId UUID PRIMARY KEY,
+    password VARCHAR(255) NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    mailaddress VARCHAR(255) NOT NULL UNIQUE,
+    admin BOOLEAN NOT NULL DEFAULT FALSE
 );
 
-//Userが提出した本文、またそのAI出力文を保存するためのSQLスキーマ
-CREATE TABLE submissions (
-  id UUID PRIMARY KEY,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  text TEXT NOT NULL,
-  res TEXT, -- AI出力文
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE SUBMISSION (
+    submissionId UUID PRIMARY KEY,
+    UserId UUID NOT NULL,
+    text TEXT NOT NULL,
+    CONSTRAINT fk_submission_user FOREIGN KEY (UserId) REFERENCES USER(UserId)
 );
 
-//Userの提出した本文に対して、AIが修正したセンテンスを保存するためのSQLスキーマ
-CREATE TABLE corrections (
-  id SERIAL PRIMARY KEY,
-  submission_id UUID REFERENCES submissions(id) ON DELETE CASCADE,
-  original TEXT NOT NULL,
-  corrected TEXT NOT NULL,
-  reason TEXT NOT NULL,
-  is_human BOOLEAN DEFAULT FALSE
+CREATE TABLE COMMENT (
+    commentId UUID PRIMARY KEY,
+    UserId UUID NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    submissionId UUID NOT NULL,
+    CONSTRAINT fk_comment_user FOREIGN KEY (UserId) REFERENCES USER(UserId),
+    CONSTRAINT fk_comment_submission FOREIGN KEY (submissionId) REFERENCES SUBMISSION(submissionId)
 );
 
-//commentsテーブルは、ユーザーが他のユーザーの提出物にコメントを追加するためのものです
-CREATE TABLE comments (
-  id SERIAL PRIMARY KEY,
-  submission_id UUID REFERENCES submissions(id) ON DELETE CASCADE,
-  user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-  text TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+CREATE TABLE CORRECTIONS (
+    submissionId UUID NOT NULL,
+    original TEXT NOT NULL,
+    corrected TEXT NOT NULL,
+    reason TEXT NOT NULL,
+    CONSTRAINT pk_corrections PRIMARY KEY (submissionId),
+    CONSTRAINT fk_corrections_submission FOREIGN KEY (submissionId) REFERENCES SUBMISSION(submissionId)
 );
+

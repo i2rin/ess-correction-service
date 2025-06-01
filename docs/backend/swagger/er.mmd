@@ -1,38 +1,33 @@
 erDiagram
-    USERS {
-        int id PK
-        varchar username
-        text password_hash
-        boolean is_admin
-        timestamp created_at
+    USER {
+        UUID UserId PK "ユーザーID（UUID）"
+        VARCHAR password "ハッシュ化されたパスワード"
+        VARCHAR name "ユーザー名"
+        VARCHAR mailaddress "メールアドレス"
+        BOOLEAN admin "管理者フラグ"
     }
-
-    SUBMISSIONS {
-        uuid id PK
-        int user_id FK
-        text text
-        text res
-        timestamp created_at
+    COMMENT {
+        UUID commentId PK "コメントID（UUID）"
+        UUID UserId FK "コメント投稿者ユーザーID"
+        VARCHAR name "コメント投稿者名"
+        TEXT message "コメント本文"
+        TIMESTAMP date "コメント日時"
+        UUID submissionId FK "コメント対象の投稿ID"
     }
-
+    SUBMISSION {
+        UUID submissionId PK "投稿ID（UUID）"
+        UUID UserId FK "投稿者ユーザーID"
+        TEXT text "投稿テキスト"
+    }
     CORRECTIONS {
-        int id PK
-        uuid submission_id FK
-        text original
-        text corrected
-        text reason
-        boolean is_human
+        UUID submissionId FK "対象投稿ID"
+        TEXT original "原文の修正箇所抜粋"
+        TEXT corrected "修正後の文章"
+        TEXT reason "修正理由"
     }
 
-    COMMENTS {
-        int id PK
-        uuid submission_id FK
-        int user_id FK
-        text text
-        timestamp created_at
-    }
+    USER ||--o{ COMMENT : "writes"
+    USER ||--o{ SUBMISSION : "creates"
+    SUBMISSION ||--o{ COMMENT : "has"
+    SUBMISSION ||--o{ CORRECTIONS : "has"
 
-    USERS ||--o{ SUBMISSIONS : creates
-    SUBMISSIONS ||--o{ CORRECTIONS : has
-    SUBMISSIONS ||--o{ COMMENTS : receives
-    USERS ||--o{ COMMENTS : writes
