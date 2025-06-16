@@ -1,0 +1,32 @@
+erDiagram
+    USER {
+        UUID UserId PK "ユーザーID（UUID）"
+        VARCHAR password "ハッシュ化されたパスワード"
+        VARCHAR name "ユーザー名"
+        VARCHAR mailaddress "メールアドレス"
+        BOOLEAN admin "管理者フラグ"
+    }
+    COMMENT {
+        UUID commentId PK "コメントID（UUID）"
+        UUID UserId FK "コメント投稿者ユーザーID"
+        VARCHAR name "コメント投稿者名"
+        TEXT message "コメント本文"
+        TIMESTAMP date "コメント日時"
+        UUID submissionId FK "コメント対象の投稿ID"
+    }
+    SUBMISSION {
+        UUID submissionId PK "投稿ID（UUID）"
+        UUID UserId FK "投稿者ユーザーID"
+        TEXT text "投稿テキスト"
+    }
+    CORRECTIONS {
+        UUID submissionId FK "対象投稿ID"
+        TEXT original "原文の修正箇所抜粋"
+        TEXT corrected "修正後の文章"
+        TEXT reason "修正理由"
+    }
+
+    USER ||--o{ COMMENT : "writes"
+    USER ||--o{ SUBMISSION : "creates"
+    SUBMISSION ||--o{ COMMENT : "has"
+    SUBMISSION ||--o{ CORRECTIONS : "has"
