@@ -1,0 +1,412 @@
+openapi: 3.0.0
+info:
+  title: 英文添削アプリAPI
+  version: 1.0.0
+
+tags:
+  - name: Login
+    description: ログイン画面
+  - name: Logout
+    description: ログアウト画面
+  - name: UserManagement
+    description: 管理者画面・ユーザー編集画面
+  - name: Timeline
+    description: タイムライン画面
+  - name: Comment
+    description: 他人の英文にコメントする画面
+  - name: Submit
+    description: 英文入力画面
+  - name: AIScore
+    description: AI採点後画面
+  - name: Notification
+    description: 通知画面
+  - name: MyPage
+    description: マイページ
+  - name: SubmissionDetail
+    description: 各投稿の詳細
+
+paths:
+  /login:
+    post:
+      tags:
+        - Login
+      summary: ログイン
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                UserId:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: ログイン成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  admin:
+                    type: boolean
+  
+  /logout:
+    post:
+      tags:
+        - Logout
+      summary: ログアウト
+      responses:
+        '200':
+          description: ログアウト成功
+
+  /users:
+    post:
+      tags:
+        - UserManagement
+      summary: ユーザー作成
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: 作成成功
+
+    get:
+      tags:
+        - UserManagement
+      summary: 全ユーザー取得
+      parameters:
+        - in: query
+          name: UserId
+          schema:
+            type: string
+      responses:
+        '200':
+          description: ユーザー情報一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+
+  /users/{UserId}:
+    put:
+      tags:
+        - UserManagement
+      summary: ユーザー更新
+      parameters:
+        - in: path
+          name: UserId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+      responses:
+        '200':
+          description: 更新成功
+
+    delete:
+      tags:
+        - UserManagement
+      summary: ユーザー削除
+      parameters:
+        - in: path
+          name: UserId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 削除成功
+
+  /timeline:
+    get:
+      tags:
+        - Timeline
+      summary: タイムライン取得
+      responses:
+        '200':
+          description: 投稿一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    text:
+                      type: string
+                    date:
+                      type: string
+                      format: date
+                    submissionId:
+                      type: string
+
+  /comment:
+    get:
+      tags:
+        - Comment
+      summary: コメント取得
+      parameters:
+        - in: query
+          name: submissionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: コメント内容
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  name:
+                    type: string
+                  text:
+                    type: string
+                  corrections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Correction'
+
+    post:
+      tags:
+        - Comment
+      summary: コメント投稿
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                submissionId:
+                  type: string
+                message:
+                  type: array
+                  items:
+                    type: string
+                date:
+                  type: string
+                  format: date
+      responses:
+        '200':
+          description: 投稿成功
+
+  /submit:
+    post:
+      tags:
+        - Submit
+      summary: 英文送信（保存なし）
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+      responses:
+        '200':
+          description: 添削結果
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  corrections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Correction'
+
+  /ai-score:
+    post:
+      tags:
+        - AIScore
+      summary: AIによる採点記録
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                text:
+                  type: string
+                corrections:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Correction'
+      responses:
+        '200':
+          description: 登録完了
+
+  /notifications:
+    get:
+      tags:
+        - Notification
+      summary: 通知取得
+      responses:
+        '200':
+          description: 通知一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    submissionId:
+                      type: string
+
+  /notification-detail:
+    get:
+      tags:
+        - Notification
+      summary: 通知詳細取得
+      parameters:
+        - in: query
+          name: submissionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 通知詳細
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        message:
+                          type: string
+
+  /mypage:
+    get:
+      tags:
+        - MyPage
+      summary: ユーザーの投稿一覧
+      responses:
+        '200':
+          description: 投稿一覧
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    date:
+                      type: string
+                      format: date
+                    text:
+                      type: string
+                    submissionId:
+                      type: string
+
+  /mypage/{submissionId}:
+    delete:
+      tags:
+        - MyPage
+      summary: 投稿削除
+      parameters:
+        - in: path
+          name: submissionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 削除完了
+
+  /submission-detail:
+    get:
+      tags:
+        - SubmissionDetail
+      summary: 投稿詳細
+      parameters:
+        - in: query
+          name: submissionId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 投稿詳細
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  text:
+                    type: string
+                  corrections:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Correction'
+                  messages:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                        message:
+                          type: string
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        UserId:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        mailaddress:
+          type: string
+        admin:
+          type: boolean
+
+    Correction:
+      type: object
+      properties:
+        original:
+          type: string
+        corrected:
+          type: string
+        reason:
+          type: string
