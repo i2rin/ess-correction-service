@@ -1,0 +1,39 @@
+services:
+  app:
+    build:
+      context: ./ess-server
+      dockerfile: docker/dev/Dockerfile
+    container_name: ess-server
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: ${DB_HOST}
+      DB_PORT: 5432
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - "8080:8080"
+  db:
+    image: postgres:16-alpine
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+    container_name: ess-db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_HOST: ${DB_HOST}
+      POSTGRES_PORT: 5432
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+volumes:
+  db_data:

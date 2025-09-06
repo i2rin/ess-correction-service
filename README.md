@@ -26,6 +26,31 @@
 npm install && npm run prepare
 ```
 
+### サーバサイドformat整形手順
+下記のコマンドをcommit前に実行する
+```
+gofmt -s -w .
+goimports -w .
+golangci-lint run
+
+```
+
+### サーバサイドdb接続手順
+下記のコマンドをそれぞれ順に実行する。
+
+``` bash
+export DB_USER=postgres
+export DB_PASSWORD=secret
+export DB_NAME=mydb 
+export DB_HOST=db
+```
+
+こちらはdev環境における変数であるためprod環境ではこの値を書き換える必要がある。
+
+```
+docker compose up --build
+```
+
 ### Storybook
 
 [http://localhost:6006/](http://localhost:6006/)から UI チェックができます．
