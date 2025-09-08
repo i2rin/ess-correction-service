@@ -1,0 +1,47 @@
+package user
+
+import (
+	abstract "ess-server/internal/core/domain/service/usecase"
+	dto "ess-server/internal/core/dto/user"
+)
+
+type TestUserUC struct{}
+
+func NewTestUserUC() *TestUserUC {
+	return &TestUserUC{}
+}
+
+var _ abstract.IUserUsecase = (*TestUserUC)(nil)
+
+func (u *TestUserUC) CreateUser(user *dto.UserInDTO) error {
+	return nil
+}
+
+func (u *TestUserUC) GetUser(page, size int) ([]*dto.UserOutDTO, error) {
+	return []*dto.UserOutDTO{
+		{
+			Nickname: "johndoe",
+			UserId:   "001",
+			Name:     "John Doe",
+			Mail:     "john.doe@example.com",
+			Password: "password1",
+			Role:     "admin",
+		},
+		{
+			Nickname: "janesmith",
+			UserId:   "002",
+			Name:     "Jane Smith",
+			Mail:     "jane.smith@example.com",
+			Password: "password2",
+			Role:     "user",
+		},
+	}, nil
+}
+
+func (u *TestUserUC) UpdateUser(user *dto.UserInDTO, userId string) error {
+	return nil
+}
+
+func (u *TestUserUC) DeleteUser(userId string) error {
+	return nil
+}
