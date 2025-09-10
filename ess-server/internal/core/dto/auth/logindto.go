@@ -2,7 +2,7 @@ package auth
 
 // LoginInDTO represents the data transfer object for login input.
 type LoginInDTO struct {
-	UserID   string `json:"userId" binding:"required"`
+	UserID   string `json:"userid" binding:"required"`
 	Password string `json:"password" binding:"required"`
 }
 

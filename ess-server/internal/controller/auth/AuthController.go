@@ -30,6 +30,10 @@ func (c *AuthController) Login(ctx *gin.Context) {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+	if loginOutDTO == nil {
+		ctx.JSON(500, gin.H{"error": "loginOutDTO is nil"})
+		return
+	}
 	ctx.JSON(200, loginOutDTO)
 }
 
