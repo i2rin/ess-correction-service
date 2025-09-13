@@ -1,32 +1,39 @@
 erDiagram
     USER {
-        UUID UserId PK "ユーザーID（UUID）"
+        UUID user_id PK "ユーザーID（UUID）"
         VARCHAR password "ハッシュ化されたパスワード"
-        VARCHAR name "ユーザー名"
-        VARCHAR mailaddress "メールアドレス"
-        BOOLEAN admin "管理者フラグ"
+        VARCHAR full_name "ユーザー本名"
+        VARCHAR nickname "ニックネーム / 表示名"
+        VARCHAR email "メールアドレス"
+        role VARCHAR "ロール"
     }
-    COMMENT {
-        UUID commentId PK "コメントID（UUID）"
-        UUID UserId FK "コメント投稿者ユーザーID"
-        VARCHAR name "コメント投稿者名"
-        TEXT message "コメント本文"
-        TIMESTAMP date "コメント日時"
-        UUID submissionId FK "コメント対象の投稿ID"
-    }
+
     SUBMISSION {
-        UUID submissionId PK "投稿ID（UUID）"
-        UUID UserId FK "投稿者ユーザーID"
+        UUID submission_id PK "投稿ID（UUID）"
+        UUID user_id FK "投稿者ユーザーID"
         TEXT text "投稿テキスト"
+        TIMESTAMP created_at "投稿日時"
     }
-    CORRECTIONS {
-        UUID submissionId FK "対象投稿ID"
+
+    COMMENT {
+        UUID comment_id PK "コメントID（UUID）"
+        UUID user_id FK "コメント投稿者ユーザーID"
+        UUID submission_id FK "コメント対象の投稿ID"
+        TEXT message "コメント本文"
+        BOOLEAN isread "確認したかどうか"
+        TIMESTAMP created_at "コメント日時"
+    }
+
+    CORRECTION {
+        UUID correction_id PK "修正ID（UUID）"
+        UUID submission_id FK "対象投稿ID"
         TEXT original "原文の修正箇所抜粋"
         TEXT corrected "修正後の文章"
         TEXT reason "修正理由"
+        TIMESTAMP created_at "修正日時"
     }
 
     USER ||--o{ COMMENT : "writes"
     USER ||--o{ SUBMISSION : "creates"
     SUBMISSION ||--o{ COMMENT : "has"
-    SUBMISSION ||--o{ CORRECTIONS : "has"
+    SUBMISSION ||--o{ CORRECTION : "has"
