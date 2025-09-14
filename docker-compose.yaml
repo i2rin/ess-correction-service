@@ -34,6 +34,21 @@ services:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
+  migrate:
+    image: migrate/migrate:v4.16.0
+    container_name: ess-migrate
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+     - ./ess-server/migrations:/migrations
+    entrypoint:
+      - migrate
+      - -path
+      - /migrations
+      - -database
+      - postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${DB_NAME}?sslmode=disable
+      - up
 
 volumes:
   db_data:
