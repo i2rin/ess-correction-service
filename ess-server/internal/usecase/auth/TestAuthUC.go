@@ -15,5 +15,5 @@ func (u *TestAuthUC) Login(i *auth.LoginInDTO) (*auth.LoginOutDTO, error) {
 	if i.GetUserID() == "" || i.GetPassword() == "" {
 		return nil, nil
 	}
-	return &auth.LoginOutDTO{Admin: true}, nil
+	return &auth.LoginOutDTO{Role: "admin"}, nil
 }

@@ -23,15 +23,15 @@ func (l *LoginInDTO) GetPassword() string {
 
 // LoginOutDTO represents the data transfer object for login output.
 type LoginOutDTO struct {
-	Admin bool `json:"admin"`
+	Role string `json:"role"`
 }
 
-func NewLoginOutDTO(admin bool) *LoginOutDTO {
+func NewLoginOutDTO(role string) *LoginOutDTO {
 	return &LoginOutDTO{
-		Admin: admin,
+		Role: role,
 	}
 }
 
-func (l *LoginOutDTO) GetAdmin() bool {
-	return l.Admin
+func (l *LoginOutDTO) GetRole() string {
+	return l.Role
 }

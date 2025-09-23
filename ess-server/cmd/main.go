@@ -16,8 +16,8 @@ func main() {
 	r := gin.Default()
 	authUsecase := authuc.NewTestAuthUC()
 	authcontroller := authctl.NewAuthController(authUsecase)
-	r.POST("/auth/login", authcontroller.Login)
-	r.GET("/auth/logout", authcontroller.Logout)
+	r.POST("/login", authcontroller.Login)
+	r.GET("/logout", authcontroller.Logout)
 
 	if err := r.Run(":8080"); err != nil {
 		log.Fatalf("Failed to run server: %v", err)
