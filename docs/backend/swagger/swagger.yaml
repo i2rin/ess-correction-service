@@ -16,8 +16,8 @@ tags:
     description: 他人の英文にコメントする画面
   - name: Submit
     description: 英文入力画面
-  - name: AIScore
-    description: AI採点後画面
+  - name: AIModify
+    description: AI添削後画面
   - name: Notification
     description: 通知画面
   - name: MyPage
@@ -38,7 +38,7 @@ paths:
             schema:
               type: object
               properties:
-                UserId:
+                userid:
                   type: string
                 password:
                   type: string
@@ -50,8 +50,9 @@ paths:
               schema:
                 type: object
                 properties:
-                  admin:
-                    type: boolean
+                  role:
+                    type: string
+                    description: "ユーザーの役割（adminまたはuser）"
   
   /logout:
     post:
@@ -83,9 +84,17 @@ paths:
       summary: 全ユーザー取得
       parameters:
         - in: query
-          name: UserId
+          name: page
           schema:
-            type: string
+            type: integer
+            default: 1
+          description: "ページ番号（1から始まる）"
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: "ページサイズ（デフォルトは10)"
       responses:
         '200':
           description: ユーザー情報一覧
@@ -94,16 +103,24 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/User'
+                  allOf:
+                  - $ref: '#/components/schemas/User'
+                  - type: object
+                  properties:
+                    userid:
+                      type: string
+                      description: "ユーザーid"
+                  required:
+                    - userid
 
-  /users/{UserId}:
+  /users/{userid}:
     put:
       tags:
         - UserManagement
       summary: ユーザー更新
       parameters:
         - in: path
-          name: UserId
+          name: userid
           required: true
           schema:
             type: string
@@ -123,7 +140,7 @@ paths:
       summary: ユーザー削除
       parameters:
         - in: path
-          name: UserId
+          name: userid
           required: true
           schema:
             type: string
@@ -136,6 +153,19 @@ paths:
       tags:
         - Timeline
       summary: タイムライン取得
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: "ページ番号（1から始まる）"
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: "ページサイズ（デフォルトは10）"
       responses:
         '200':
           description: 投稿一覧
@@ -146,27 +176,39 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
+                    nickname:
                       type: string
                     text:
                       type: string
                     date:
                       type: string
                       format: date
-                    submissionId:
+                    submissionid:
                       type: string
 
-  /comment:
+  /comment/{submissionid}:
     get:
       tags:
         - Comment
       summary: コメント取得
       parameters:
-        - in: query
-          name: submissionId
+        - in: path
+          name: submissionid
           required: true
           schema:
             type: string
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: "ページ番号（1から始まる）"
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: "ページサイズ（デフォルトは10）"
       responses:
         '200':
           description: コメント内容
@@ -175,7 +217,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  name:
+                  nickname:
                     type: string
                   text:
                     type: string
@@ -183,27 +225,39 @@ paths:
                     type: array
                     items:
                       $ref: '#/components/schemas/Correction'
+                  comments:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nickname:
+                          type: string
+                        comment:
+                          type: string
 
     post:
       tags:
         - Comment
       summary: コメント投稿
+      parameters:
+        - in: path
+          name: submissionid
+          required: true
+          schema:
+            type: string
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - comment
               properties:
-                submissionId:
-                  type: string
-                message:
+                comment:
                   type: array
                   items:
                     type: string
-                date:
-                  type: string
-                  format: date
       responses:
         '200':
           description: 投稿成功
@@ -237,11 +291,11 @@ paths:
                     items:
                       $ref: '#/components/schemas/Correction'
 
-  /ai-score:
+  /submit-decide:
     post:
       tags:
-        - AIScore
-      summary: AIによる採点記録
+        - AIModify
+      summary: AI添削後の英文登録
       requestBody:
         required: true
         content:
@@ -264,6 +318,19 @@ paths:
       tags:
         - Notification
       summary: 通知取得
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: "ページ番号（1から始まる）"
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: "ページサイズ（デフォルトは10）"
       responses:
         '200':
           description: 通知一覧
@@ -274,19 +341,29 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
+                    userid:
                       type: string
-                    submissionId:
+                    nickname:
                       type: string
+                    submissionid:
+                      type: string
+                    date:
+                      type: string
+                      format: date-time
 
-  /notification-detail:
+  /notification-detail/{userid}/{submissionid}:
     get:
       tags:
         - Notification
       summary: 通知詳細取得
       parameters:
-        - in: query
-          name: submissionId
+        - in: path
+          name: userid
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: submissionid
           required: true
           schema:
             type: string
@@ -300,14 +377,14 @@ paths:
                 properties:
                   text:
                     type: string
-                  messages:
+                  nickname:
+                    type: string
+                  comments:
                     type: array
                     items:
                       type: object
                       properties:
-                        name:
-                          type: string
-                        message:
+                        comment:
                           type: string
 
   /mypage:
@@ -315,6 +392,19 @@ paths:
       tags:
         - MyPage
       summary: ユーザーの投稿一覧
+      parameters:
+        - in: query
+          name: page
+          schema:
+            type: integer
+            default: 1
+          description: "ページ番号（1から始まる）"
+        - in: query
+          name: size
+          schema:
+            type: integer
+            default: 10
+          description: "ページサイズ（デフォルトは10）"
       responses:
         '200':
           description: 投稿一覧
@@ -325,24 +415,24 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
+                    nickname:
                       type: string
                     date:
                       type: string
                       format: date
                     text:
                       type: string
-                    submissionId:
+                    submissionid:
                       type: string
 
-  /mypage/{submissionId}:
+  /mypage/{submissionid}:
     delete:
       tags:
         - MyPage
       summary: 投稿削除
       parameters:
         - in: path
-          name: submissionId
+          name: submissionid
           required: true
           schema:
             type: string
@@ -350,14 +440,14 @@ paths:
         '200':
           description: 削除完了
 
-  /submission-detail:
+  /submission-detail/{submissionid}:
     get:
       tags:
         - SubmissionDetail
-      summary: 投稿詳細
+      summary: 投稿詳細取得
       parameters:
-        - in: query
-          name: submissionId
+        - in: path
+          name: submissionid
           required: true
           schema:
             type: string
@@ -369,28 +459,31 @@ paths:
               schema:
                 type: object
                 properties:
+                  nickname:
+                    type: string
                   text:
                     type: string
                   corrections:
                     type: array
                     items:
                       $ref: '#/components/schemas/Correction'
-                  messages:
+                  comments:
                     type: array
                     items:
                       type: object
                       properties:
-                        name:
+                        nickname:
                           type: string
-                        message:
+                        comment:
                           type: string
+
 
 components:
   schemas:
     User:
       type: object
       properties:
-        UserId:
+        nickname:
           type: string
         password:
           type: string
@@ -398,8 +491,9 @@ components:
           type: string
         mailaddress:
           type: string
-        admin:
-          type: boolean
+        role:
+          type: string
+          description: "ユーザーの役割（adminまたはuser）"
 
     Correction:
       type: object
