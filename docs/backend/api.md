@@ -90,7 +90,7 @@ POST リクエストで以下の形式を送信します。
 ```json
 [
   {
-    "name": "string",       // 直近に投稿したユーザ名
+    "nickname": "string",       // 直近に投稿したユーザ名
     "text": "string",       // そのユーザの投稿本文
     "date": "2025-09-13",
     "submissionid": "string"
@@ -109,7 +109,7 @@ POST リクエストで以下の形式を送信します。
 ### レスポンス形式
 ```json
 {
-  "name": "string",        // 選択したユーザの名前
+  "nickname": "string",        // 選択したユーザの名前
   "text": "string",        // 選択したユーザが記述した英文
   "corrections": [
     {
@@ -188,7 +188,7 @@ GET リクエストを送信します。
 [
   {
     "userid": "string",       // 自分にコメントしたユーザの userid
-    "name": "string",         // 自分にコメントしたユーザの名前
+    "nickname": "string",         // 自分にコメントしたユーザの名前
     "submissionid": "string",
     "date": "2025-09-13T09:05:56.525Z"
   }
@@ -207,7 +207,7 @@ GET リクエストを送信します。
 ```json
 {
   "text": "string",           // 自分が作成した英文
-  "name": "string",           // コメントしたユーザの名前
+  "nickname": "string",           // コメントしたユーザの名前
   "comments": [
     {
       "comment": "string"    // コメント内容
@@ -232,7 +232,7 @@ GET リクエストを送信します。
 ```json
 [
   {
-    "name": "string",          // 自分の名前（不要なら省略可）
+    "nickname": "string",          // 自分の名前（不要なら省略可）
     "date": "2025-09-13",
     "text": "string",          // 自分の作成した文章
     "submissionid": "string"
@@ -248,7 +248,7 @@ GET リクエストを送信します。
 ### レスポンス形式
 ```json
 {
-  "name": "string",           // 自分の名前
+  "nickname": "string",           // 自分の名前
   "text": "string",           // 自分の作成した英文
   "corrections": [
     {

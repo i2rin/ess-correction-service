@@ -176,7 +176,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
+                    nickname:
                       type: string
                     text:
                       type: string
@@ -217,7 +217,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  name:
+                  nickname:
                     type: string
                   text:
                     type: string
@@ -230,7 +230,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        name:
+                        nickname:
                           type: string
                         comment:
                           type: string
@@ -343,7 +343,7 @@ paths:
                   properties:
                     userid:
                       type: string
-                    name:
+                    nickname:
                       type: string
                     submissionid:
                       type: string
@@ -377,7 +377,7 @@ paths:
                 properties:
                   text:
                     type: string
-                  name:
+                  nickname:
                     type: string
                   comments:
                     type: array
@@ -415,7 +415,7 @@ paths:
                 items:
                   type: object
                   properties:
-                    name:
+                    nickname:
                       type: string
                     date:
                       type: string
@@ -459,7 +459,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  name:
+                  nickname:
                     type: string
                   text:
                     type: string
@@ -472,7 +472,7 @@ paths:
                     items:
                       type: object
                       properties:
-                        name:
+                        nickname:
                           type: string
                         comment:
                           type: string
